@@ -4,6 +4,7 @@ import 'package:media_kit/media_kit.dart';
 import 'package:pro_video_editor/pro_video_editor.dart';
 import 'package:pro_video_editor_example/features/editor/pages/video_editor_basic_example_page.dart';
 import 'package:pro_video_editor_example/features/editor/pages/video_editor_grounded_example_page.dart';
+import 'package:pro_video_editor_example/features/vine_recorder/vine_recorder.dart';
 
 import 'features/metadata/video_metadata_example_page.dart';
 import 'features/render/video_renderer_page.dart';
@@ -55,6 +56,12 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String _platformVersion = 'Unknown';
   final List<_ExampleListItem> _exampleList = [
+    _ExampleListItem(
+      icon: Icons.video_camera_back,
+      title: 'Vine-Style Recorder',
+      pageBuilder: () => const VineRecorderPage(),
+      isHighlighted: true,
+    ),
     _ExampleListItem(
       icon: Icons.info_outline,
       title: 'Video-Metadata',
@@ -120,8 +127,25 @@ class _HomePageState extends State<HomePage> {
             child: ListView(
               children: _exampleList.map((item) {
                 return ListTile(
-                  leading: Icon(item.icon),
-                  title: Text(item.title),
+                  leading: Icon(
+                    item.icon,
+                    color: item.isHighlighted ? Colors.red : null,
+                  ),
+                  title: Text(
+                    item.title,
+                    style: item.isHighlighted
+                        ? const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red,
+                          )
+                        : null,
+                  ),
+                  subtitle: item.isHighlighted
+                      ? const Text(
+                          'NEW: Multi-clip Vine-style capture',
+                          style: TextStyle(color: Colors.red),
+                        )
+                      : null,
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
                     Navigator.push(
@@ -146,8 +170,10 @@ class _ExampleListItem {
     required this.icon,
     required this.title,
     required this.pageBuilder,
+    this.isHighlighted = false,
   });
   final IconData icon;
   final String title;
   final Widget Function() pageBuilder;
+  final bool isHighlighted;
 }
