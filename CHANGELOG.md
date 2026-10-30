@@ -1,3 +1,6 @@
+## Unreleased
+- **FIX**(iOS, macOS): Opt in to source-track frame timing with `VideoRenderData.preserveSourceFrameTiming` when an effect must retain each picture of a fractional- or variable-rate source. Requires one video segment without a frame-rate cap. Ordinary renders keep their existing clock.
+
 ## 2.48.0
 - **FEAT**(android, iOS, macOS): Spin and flip layer animations. `LayerAnimationType.spin` turns a layer around its centre and `LayerAnimationType.flip` turns it around its vertical or horizontal axis like a card (`FlipAxis`), both by `LayerAnimation.turns` full turns. In a `loop` they keep turning instead of swinging back. A `switch` over `LayerAnimationType` has to handle the new values.
 

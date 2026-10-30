@@ -35,6 +35,7 @@ class VideoRenderData {
     this.transform,
     this.enableAudio = true,
     this.trimToCommonTrackEnd = false,
+    this.preserveSourceFrameTiming = false,
     this.startTime,
     this.endTime,
     this.colorFilters = const [],
@@ -130,6 +131,7 @@ class VideoRenderData {
     ExportTransform? transform,
     bool enableAudio = true,
     bool trimToCommonTrackEnd = false,
+    bool preserveSourceFrameTiming = false,
     Duration? startTime,
     Duration? endTime,
     double? blur,
@@ -155,6 +157,7 @@ class VideoRenderData {
       transform: transform,
       enableAudio: enableAudio,
       trimToCommonTrackEnd: trimToCommonTrackEnd,
+      preserveSourceFrameTiming: preserveSourceFrameTiming,
       startTime: startTime,
       endTime: endTime,
       blur: blur,
@@ -353,6 +356,18 @@ class VideoRenderData {
   ///
   /// **Note:** Ignored on Web, Windows and Linux.
   final int? maxFrameRate;
+
+  /// Derives iOS/macOS composition frame times from the source video track.
+  ///
+  /// Use this when every source picture and its timestamp must survive effects,
+  /// including fractional or variable frame rates. Defaults to `false`, leaving
+  /// the renderer's ordinary fixed composition clock unchanged.
+  ///
+  /// On iOS/macOS this requires exactly one video segment, no layered
+  /// composition and no [maxFrameRate]. Unsupported combinations fail the
+  /// render.
+  /// Other platforms ignore this option.
+  final bool preserveSourceFrameTiming;
 
   /// Whether to optimize the video for network streaming (fast start).
   ///
@@ -566,6 +581,7 @@ class VideoRenderData {
       // set, so a `qualityConfig` used on its own is still applied.
       'bitrate': bitrate ?? qualityConfig?.bitrate,
       'maxFrameRate': maxFrameRate,
+      'preserveSourceFrameTiming': preserveSourceFrameTiming,
       'scaleX': scaleX,
       'scaleY': scaleY,
       'outputWidth': outputWidth,
@@ -600,6 +616,7 @@ class VideoRenderData {
     ChromaKey? chromaKey,
     int? bitrate,
     int? maxFrameRate,
+    bool? preserveSourceFrameTiming,
     bool? shouldOptimizeForNetworkUse,
     bool? imageBytesWithCropping,
   }) {
@@ -623,6 +640,8 @@ class VideoRenderData {
       chromaKey: chromaKey ?? this.chromaKey,
       bitrate: bitrate ?? this.bitrate,
       maxFrameRate: maxFrameRate ?? this.maxFrameRate,
+      preserveSourceFrameTiming:
+          preserveSourceFrameTiming ?? this.preserveSourceFrameTiming,
       shouldOptimizeForNetworkUse:
           shouldOptimizeForNetworkUse ?? this.shouldOptimizeForNetworkUse,
       imageBytesWithCropping:
@@ -692,6 +711,7 @@ class VideoRenderData {
       'chromaKey': chromaKey?.toMap(),
       'bitrate': bitrate,
       'maxFrameRate': maxFrameRate,
+      'preserveSourceFrameTiming': preserveSourceFrameTiming,
       'shouldOptimizeForNetworkUse': shouldOptimizeForNetworkUse,
       'imageBytesWithCropping': imageBytesWithCropping,
     };
@@ -765,6 +785,7 @@ class VideoRenderData {
           ? ChromaKey.fromMap(map['chromaKey'] as Map<String, dynamic>)
           : null,
       bitrate: map['bitrate'] != null ? safeParseInt(map['bitrate']) : null,
+      preserveSourceFrameTiming: map['preserveSourceFrameTiming'] == true,
       maxFrameRate: map['maxFrameRate'] != null
           ? safeParseInt(map['maxFrameRate'])
           : null,
@@ -799,6 +820,7 @@ class VideoRenderData {
         'chromaKey: $chromaKey, '
         'bitrate: $bitrate, '
         'maxFrameRate: $maxFrameRate, '
+        'preserveSourceFrameTiming: $preserveSourceFrameTiming, '
         'shouldOptimizeForNetworkUse: $shouldOptimizeForNetworkUse, '
         'imageBytesWithCropping: $imageBytesWithCropping)';
   }
@@ -826,6 +848,7 @@ class VideoRenderData {
         other.chromaKey == chromaKey &&
         other.bitrate == bitrate &&
         other.maxFrameRate == maxFrameRate &&
+        other.preserveSourceFrameTiming == preserveSourceFrameTiming &&
         other.shouldOptimizeForNetworkUse == shouldOptimizeForNetworkUse &&
         other.imageBytesWithCropping == imageBytesWithCropping;
   }
@@ -851,6 +874,7 @@ class VideoRenderData {
         chromaKey.hashCode ^
         bitrate.hashCode ^
         maxFrameRate.hashCode ^
+        preserveSourceFrameTiming.hashCode ^
         shouldOptimizeForNetworkUse.hashCode ^
         imageBytesWithCropping.hashCode;
   }
